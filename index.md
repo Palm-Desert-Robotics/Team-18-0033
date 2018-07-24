@@ -1,0 +1,685 @@
+```c++ 
+//name own function
+
+void turnleft();
+
+void turnright();
+
+void forward();
+
+void backward();
+
+
+
+//set variables
+
+int xcenterright = 70;
+
+int xcenterleft = 90;
+
+int areabig = 9000;
+
+int areasmall = 7250;
+
+int channel = 0;
+
+int rightmotor_turningspeed = -350;
+
+int leftmotor_turningspeed = 350;
+
+int rightmotor_speed = -500;
+
+int leftmotor_speed = 500;    
+
+
+
+//state motor ports
+
+int leftmotor = 0;
+
+int rightmotor = 2;
+
+
+
+int main()
+
+{
+
+    camera_open();
+
+
+
+    printf("Hello World\n");
+
+    while (1==1) {
+
+
+
+        camera_update();
+
+        int x = get_object_center_x(channel,0);
+
+        
+
+        ao();
+
+        
+
+        while (x > xcenterright && x < xcenterleft) {
+
+            printf("aligned in x\n");
+
+            camera_update();
+
+            
+
+            x = get_object_center_x(channel,0);
+
+
+
+            if (get_object_area(channel, 0) < areasmall)
+
+            {
+
+                forward();
+
+            }
+
+
+
+            if(get_object_area(channel, 0) > areabig)
+
+            {
+
+                backward();
+
+            }
+
+
+
+            if (get_object_area(channel, 0) < areabig && get_object_area(channel, 0) > areasmall)
+
+            {
+
+                printf("aligned in distance");
+
+                ao();
+
+            }    
+
+
+
+        }
+
+    }
+
+
+
+    camera_close(); //close the camera  
+
+    
+
+    return 0;
+
+}
+
+void turnleft()
+
+{
+
+    mav(rightmotor, rightmotor_turningspeed);
+
+    mav(leftmotor, -leftmotor_turningspeed);
+
+}
+
+
+
+void turnright()
+
+{
+
+    mav(rightmotor, -rightmotor_turningspeed);
+
+    mav(leftmotor, leftmotor_turningspeed);
+
+}    
+
+
+
+void forward()
+
+{
+
+    mav(rightmotor, rightmotor_turningspeed);
+
+    mav(leftmotor, leftmotor_turningspeed);
+
+}     
+
+
+
+void backward()
+
+{
+
+    mav(rightmotor, -rightmotor_turningspeed);
+
+    mav(leftmotor, -leftmotor_turningspeed);
+
+}
+
+
+
+
+
+
+
+
+
+#include <kipr/botball.h>
+
+
+
+int main()
+
+{
+
+
+
+    wait_for_light(0);
+
+
+
+    int blackline2 = 3700;
+
+    int blackline5 = 1600;
+
+
+
+    printf("Hello World\n");
+
+
+
+    enable_servos();
+
+
+
+    set_servo_position(0,670);
+
+
+
+    set_servo_position(2,1000);
+
+    msleep(500);
+
+
+
+    //black line start
+
+    mav(0,1000);
+
+    mav(2,900);
+
+    msleep(2000);
+
+
+
+    while(analog(2) < blackline2)
+
+    {
+
+        mav(0,1000);
+
+        mav(2,900);  
+
+    }
+
+
+
+    while(1 == 1)
+
+    {
+
+        if(analog(4) > 2000)
+
+        {
+
+            break;
+
+        }
+
+        if(analog(2) > blackline2)
+
+        {
+
+            mav(0,750);
+
+            mav(2,0);
+
+        }
+
+        else
+
+        {
+
+            if(analog(2) < blackline2)
+
+            {
+
+                mav(0,0);
+
+                mav(2,750);
+
+            }
+
+        }
+
+    }
+
+    //black line end
+
+
+
+    //grab yellow blocks start
+
+    while(analog(4) > 1450)
+
+    {
+
+        mav(0,-200);
+
+        mav(2,-90);
+
+    }
+
+    ao();
+
+
+
+    set_servo_position(0,1900);
+
+    msleep(2000);
+
+
+
+    set_servo_position(2,500);
+
+    msleep(500);
+
+
+
+    //grab yellow blocks end
+
+
+
+    mav(0,-800);
+
+    mav(2,-900);
+
+    msleep(2000);
+
+
+
+    set_servo_position(0,1850);
+
+    msleep(500);
+
+
+
+    while(analog(2) < blackline2)
+
+    {
+
+        mav(0,800);
+
+        mav(2,800);  
+
+    }
+
+
+
+    mav(0,800);
+
+    mav(2,-500);
+
+    msleep(1500);
+
+
+
+    clear_motor_position_counter(0);
+
+
+
+    while(get_motor_position_counter(0) < 5000)
+
+    {
+
+        if(analog(2) > blackline2)
+
+        {
+
+            mav(0,750);
+
+            mav(2,650);
+
+        }
+
+        else
+
+        {
+
+            if(analog(2) < blackline2)
+
+            {
+
+                mav(0,650);
+
+                mav(2,750);
+
+            }
+
+        }
+
+    }
+
+
+
+    camera_open();
+
+    while(1 == 1)
+
+    {
+
+        camera_update();
+
+        if(get_object_center_x(0,0) > 78 && get_object_center_x(0,0) < 82)
+
+        {
+
+            if(get_object_area(0,0) >= 350)
+
+            {
+
+                break;
+
+            }
+
+            else
+
+            {
+
+                if(analog(5) > blackline5)
+
+                {
+
+                    mav(0,-750);
+
+                    mav(2,-550);
+
+                }
+
+                else
+
+                {
+
+                    if(analog(5) < blackline5)
+
+                    {
+
+                        mav(0,-550);
+
+                        mav(2,-750);
+
+                    }
+
+                }
+
+            }
+
+        }
+
+        else
+
+        {
+
+            if(analog(5) > blackline5)
+
+            {
+
+                mav(0,-750);
+
+                mav(2,-550);
+
+            }
+
+            else
+
+            {
+
+                if(analog(5) < blackline5)
+
+                {
+
+                    mav(0,-550);
+
+                    mav(2,-750);
+
+                }
+
+            }
+
+        }
+
+    }
+
+
+
+    printf("%i\n" , get_object_center_x(0,0));
+
+    printf("%i\n" , get_object_area(0,0));
+
+
+
+    mav(0,500);
+
+    mav(2,-500);
+
+    msleep(1800);
+
+
+
+    mav(0,500);
+
+    mav(2,500);  
+
+    msleep(3200);
+
+    ao();
+
+
+
+    set_servo_position(0,1900);
+
+    msleep(100);
+
+
+
+    set_servo_position(2,1000);
+
+    msleep(1000);
+
+
+
+
+
+    set_servo_position(0,1650);
+
+    msleep(1000);
+
+
+
+    set_servo_position(2,500);
+
+    msleep(1000);
+
+
+
+    set_servo_position(0,1400);
+
+    msleep(1000);
+
+
+
+    mav(0,-500);
+
+    mav(2,0);
+
+    msleep(1500);
+
+    ao();
+
+
+
+    mav(0,500);
+
+    mav(2,500);
+
+    msleep(1000);
+
+
+
+    ao();
+
+
+
+    set_servo_position(0,1800);
+
+    msleep(500);
+
+
+
+    set_servo_position(2,1000);
+
+    msleep(500);
+
+
+
+    mav(0,-500);
+
+    mav(2,-500);
+
+    msleep(1000);
+
+
+
+    set_servo_position(0,1000);
+
+    msleep(500);
+
+
+
+    while(analog (2) < blackline2)
+
+    {
+
+        mav(0,-500);
+
+        mav(2,-500);
+
+    }
+
+
+
+    mav(0,200);
+
+    mav(2,800);
+
+    msleep(600);
+
+
+
+    while(analog(4) >= 1600)
+
+    {
+
+        if(analog(2) <= blackline2)
+
+        {
+
+            mav(0,700);
+
+            mav(2,800);
+
+        }
+
+        else
+
+        {
+
+            if(analog(2) >= blackline2)
+
+            {
+
+                mav(0,800);
+
+                mav(2,700);
+
+            }
+
+        }
+
+    }
+
+    printf("%i\n" , analog(4));
+
+
+
+    while(analog(4) <= 2500)
+
+    {
+
+        if(analog(2) <= blackline2)
+
+        {
+
+            mav(0,700);
+
+            mav(2,800);
+
+        }
+
+        else
+
+        {
+
+            if(analog(2) >= blackline2)
+
+            {
+
+                mav(0,800);
+
+                mav(2,700);
+
+            }
+
+        }
+
+    }
+
+    printf("%i\n" , analog(4));
+
+
+
+    disable_servos();
+
+
+
+    camera_close();
+
+
+
+    return 0;
+
+}
+```
